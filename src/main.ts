@@ -1,6 +1,7 @@
 import { searchCountries } from './api.js';
 import type { CountryView } from './mapper.js';
 import { SearchController, type State } from './search-controller.js';
+import { createCachedSearch } from './cache.js';
 
 type Child = Node | string | null;
 
@@ -139,5 +140,6 @@ function render(state: State): void {
   }
 }
 
-const controller = new SearchController(searchCountries, render);
+const cachedSearch = createCachedSearch(searchCountries);
+const controller = new SearchController(cachedSearch, render);
 input.addEventListener('input', () => controller.input(input.value));
