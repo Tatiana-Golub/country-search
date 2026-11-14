@@ -119,3 +119,26 @@ input {
   color: teal;
   background-color: #fff;
 }
+
+.history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.history-item {
+  border: 1px solid teal;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  color: teal;
+  background-color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background-color: teal;
+  color: #fff;
+}

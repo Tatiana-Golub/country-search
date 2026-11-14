@@ -2,6 +2,7 @@ import { searchCountries } from './api.js';
 import type { CountryView } from './mapper.js';
 import { SearchController, type State } from './search-controller.js';
 import { createCachedSearch } from './cache.js';
+import { addToHistory, loadHistory } from './history.js';
 
 type Child = Node | string | null;
 
@@ -21,12 +22,14 @@ const input = buildElement('input', {
   placeholder: 'Search a country…',
 });
 const statusBox = buildElement('div');
+const historyBox = buildElement('div', { className: 'history' });
 const list = buildElement('div');
 
 document.body.append(
   buildElement('h1', {}, 'Country search'),
   buildElement('label', { htmlFor: 'q' }, 'Country name'),
   input,
+  historyBox,
   statusBox,
   list,
 );
@@ -95,6 +98,21 @@ function renderItem(country: CountryView): HTMLElement {
   return buildElement('div', { className: 'item' }, card, slot);
 }
 
+function renderHistory(queries: string[]): void {
+  historyBox.replaceChildren(
+    ...queries.map((query) =>
+      buildElement('button', {
+        className: 'history-item',
+        textContent: query,
+        onclick: () => {
+          input.value = query;
+          controller.searchNow(query); // skips the debounce; served from cache when possible
+        },
+      }),
+    ),
+  );
+}
+
 function render(state: State): void {
   statusBox.replaceChildren();
   list.replaceChildren();
@@ -136,6 +154,7 @@ function render(state: State): void {
       break;
     case 'results':
       list.append(...state.items.map(renderItem));
+      renderHistory(addToHistory(localStorage, state.query));
       break;
   }
 }
@@ -143,3 +162,4 @@ function render(state: State): void {
 const cachedSearch = createCachedSearch(searchCountries);
 const controller = new SearchController(cachedSearch, render);
 input.addEventListener('input', () => controller.input(input.value));
+renderHistory(loadHistory(localStorage));
